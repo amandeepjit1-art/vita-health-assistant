@@ -1,1 +1,52 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Health Assistant Ultimate</title><style>body{font-family:Arial;margin:0;background:linear-gradient(135deg,#e8f7ff,#f5fff5)}header{background:#0a84ff;color:#fff;padding:20px;text-align:center}.wrap{max-width:1200px;margin:auto;padding:20px}.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin:10px 0}#chat{height:350px;overflow:auto}.msg{padding:10px;border-radius:10px;margin:8px 0}.u{background:#d8edff}.b{background:#eefcee}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}input,button{padding:10px;margin:5px}button{background:#0a84ff;color:#fff;border:none;border-radius:8px}</style></head><body><header><h1>🏥 AI Health Assistant Ultimate</h1></header><div class="wrap"><div class="grid"><div class="card"><h3>💬 Health Assistant</h3><div id="chat"><div class="msg b">Hello! Ask me about sleep, diet, stress, exercise, hydration, BMI, calories, blood pressure and more.</div></div><input id="q" placeholder="Ask a health question"><button onclick="send()">Send</button></div><div><div class="card"><h3>BMI Calculator</h3><input id="h" placeholder="Height cm"><input id="w" placeholder="Weight kg"><button onclick="bmi()">Calculate BMI</button><p id="bmiout"></p></div><div class="card"><h3>Calorie Calculator</h3><input id="age" placeholder="Age"><input id="weight" placeholder="Weight kg"><input id="height" placeholder="Height cm"><button onclick="cal()">Estimate Calories</button><p id="calout"></p></div></div></div></div><script>const db={sleep:'Adults generally need 7-9 hours of sleep.',water:'Drink about 2-3 liters daily.',diet:'Focus on fruits, vegetables, protein and whole grains.',exercise:'Aim for 150 minutes of exercise weekly.',stress:'Practice breathing techniques and regular exercise.',anxiety:'Healthy routines and relaxation can help.',headache:'Hydration and rest may help common headaches.',cold:'Rest and fluids support recovery.',immunity:'Sleep, exercise and nutrition support immunity.',heart:'Regular activity supports heart health.',pressure:'Monitor blood pressure and reduce excess salt.',diabetes:'Maintain healthy eating and follow medical advice.',cholesterol:'Increase fiber and reduce saturated fat.',protein:'Protein helps muscle repair.',vitamin:'Vitamins support overall wellness.',weight:'Consistent healthy eating and activity help weight management.',walking:'Daily walking has many benefits.',bmi:'BMI measures weight relative to height.',calorie:'Calories provide energy.',back pain:'Stretching and posture may help.',dizzy:'Stay hydrated and seek care if persistent.'};function add(t,c){chat.innerHTML+=`<div class="msg ${c}">${t}</div>`;chat.scrollTop=99999;}function reply(x){x=x.toLowerCase();if(x.includes('hello')||x.includes('hi')) return 'Hello! How can I help with your health and wellness questions?';if(x.includes('thank')) return 'You are welcome!';for(let k in db){if(x.includes(k)) return db[k];}return 'I can answer general wellness questions about sleep, hydration, nutrition, exercise, stress, BMI, calories, heart health and healthy habits. For medical emergencies contact a healthcare professional.';}function send(){let t=q.value;if(!t)return;add(t,'u');add(reply(t),'b');q.value='';}function bmi(){let h=parseFloat(document.getElementById('h').value)/100;let w=parseFloat(document.getElementById('w').value);let b=(w/(h*h)).toFixed(1);document.getElementById('bmiout').innerText='BMI: '+b;}function cal(){let a=parseFloat(age.value),w=parseFloat(weight.value),h=parseFloat(height.value);let c=Math.round(10*w+6.25*h-5*a+5);calout.innerText='Estimated daily calories: '+c;}</script></body></html>
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Health Assistant</title><style>
+body{font-family:Segoe UI,sans-serif;margin:0;background:#eef6ff}
+.header{background:#0a84ff;color:#fff;padding:20px;text-align:center}
+.container{max-width:1200px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-bottom:20px}
+#suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;max-height:180px;overflow:auto}
+.tag{background:#e8f2ff;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:13px}
+#chat{height:380px;overflow:auto;border:1px solid #ddd;padding:10px;border-radius:10px}
+.msg{padding:10px;border-radius:10px;margin:8px 0}.user{background:#d9ecff}.bot{background:#eefceb}
+input,select,button{padding:10px;border-radius:8px;border:1px solid #ccc} button{background:#0a84ff;color:white}
+</style></head><body>
+<div class='header'><h1>🏥 AI Health Assistant</h1></div>
+<div class='container'>
+<div class='card'>
+<h3>💡 Suggested Questions</h3>
+<div id='suggestions'></div>
+<h3>💬 Ask Your Health Question</h3>
+<div id='chat'><div class='msg bot'>Hello! Ask me any general health, fitness, nutrition, sleep, stress, exercise, BMI or wellness question.</div></div>
+<div style='margin-top:10px'><input id='q' style='width:75%' placeholder='Type your question...'> <button onclick='send()'>Ask</button></div>
+</div>
+<div class='card'>
+<h3>📊 BMI Calculator</h3>
+<input id='h' placeholder='Height (cm)'><input id='w' placeholder='Weight (kg)'>
+<button onclick='bmi()'>Calculate BMI</button><p id='b'></p>
+</div>
+<div class='card'>
+<h3>🔥 Calorie Estimator</h3>
+<select id='g'><option value='male'>Male</option><option value='female'>Female</option></select>
+<input id='age' placeholder='Age'><input id='wt' placeholder='Weight (kg)'><input id='ht' placeholder='Height (cm)'>
+<button onclick='cal()'>Estimate Calories</button><p id='c'></p>
+</div></div>
+<script>
+const questions=["How much water should I drink?","How much sleep do I need?","Healthy diet tips?","How can I lose weight?","How can I gain weight?","Benefits of walking?","What is BMI?","How to reduce stress?","How to improve focus?","What causes headaches?","How to boost immunity?","Healthy breakfast ideas?","Protein benefits?","Vitamin D benefits?","How many calories do I need?","How to lower cholesterol?","What is healthy blood pressure?","How to avoid dehydration?","Exercise for beginners?","Heart healthy foods?","What is diabetes?","How to sleep better?","Reduce anxiety tips?","Back pain tips?","Healthy snacks?","What causes fatigue?","Benefits of stretching?","Foods high in iron?","Importance of fiber?","Cold remedies?","Daily step goal?","Weight loss foods?","Meditation benefits?","Running benefits?","Strength training?","Healthy aging tips?","Office exercise tips?","Hydration importance?","Mental wellness tips?","Exercise frequency?","How much protein daily?","Healthy habits?","Improve posture?","Joint health tips?","Bone health tips?","Prevent burnout?","What is metabolism?","Stress eating tips?","Healthy heart habits?","Sleep schedule tips?","Best foods for energy?","Reduce sugar intake?","Immune health foods?","Healthy lifestyle?","Healthy lunch ideas?","Healthy dinner ideas?","What causes dizziness?","How many fruits daily?","How many vegetables daily?","Benefits of yoga?"];
+questions.forEach(x=>{let s=document.createElement('span');s.className='tag';s.innerText=x;s.onclick=()=>{q.value=x;send()};suggestions.appendChild(s);});
+function add(t,c){chat.innerHTML+=`<div class="msg ${c}">${t}</div>`;chat.scrollTop=chat.scrollHeight;}
+function reply(q){q=q.toLowerCase();
+if(q.includes('hello')||q.includes('hi')) return 'Hello! How can I support your health and wellness goals today?';
+if(q.includes('sleep')) return 'Most adults need 7 to 9 hours of quality sleep each night.';
+if(q.includes('water')||q.includes('hydration')) return 'Most adults benefit from around 2 to 3 liters of fluid daily.';
+if(q.includes('weight loss')) return 'Combine a balanced diet, calorie awareness, and regular exercise.';
+if(q.includes('stress')||q.includes('anxiety')) return 'Deep breathing, exercise, sleep and mindfulness can help manage stress.';
+if(q.includes('heart')) return 'Regular exercise, less processed food, and maintaining healthy weight support heart health.';
+if(q.includes('blood pressure')) return 'Healthy lifestyle habits and regular monitoring are important.';
+if(q.includes('protein')) return 'Protein supports muscle repair and overall body functions.';
+if(q.includes('vitamin')) return 'Vitamins support essential body functions and overall wellness.';
+if(q.includes('diabetes')) return 'Healthy eating, physical activity and medical follow-up help manage diabetes.';
+if(q.includes('headache')) return 'Hydration, sleep and stress reduction may help occasional headaches.';
+return 'I can provide general wellness guidance on nutrition, exercise, sleep, stress management, BMI, calories, healthy habits and common wellness questions. For diagnosis or emergencies, consult a healthcare professional.';}
+function send(){let t=q.value.trim(); if(!t)return; add(t,'user'); setTimeout(()=>add(reply(t),'bot'),200); q.value='';}
+function bmi(){let hm=parseFloat(h.value)/100,kg=parseFloat(w.value); let v=(kg/(hm*hm)).toFixed(1); let cat=v<18.5?'Underweight':v<25?'Normal':v<30?'Overweight':'Obese'; b.innerHTML='BMI: '+v+' ('+cat+')';}
+function cal(){let agev=+age.value,wv=+wt.value,hv=+ht.value; let bmr=g.value==='male'?(10*wv+6.25*hv-5*agev+5):(10*wv+6.25*hv-5*agev-161); c.innerHTML='Estimated BMR: '+Math.round(bmr)+' kcal/day';}
+</script></body></html>
