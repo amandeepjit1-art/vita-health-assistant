@@ -1,52 +1,641 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Health Assistant</title><style>
-body{font-family:Segoe UI,sans-serif;margin:0;background:#eef6ff}
-.header{background:#0a84ff;color:#fff;padding:20px;text-align:center}
-.container{max-width:1200px;margin:auto;padding:20px}
-.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 3px 10px rgba(0,0,0,.12);margin-bottom:20px}
-#suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;max-height:180px;overflow:auto}
-.tag{background:#e8f2ff;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:13px}
-#chat{height:380px;overflow:auto;border:1px solid #ddd;padding:10px;border-radius:10px}
-.msg{padding:10px;border-radius:10px;margin:8px 0}.user{background:#d9ecff}.bot{background:#eefceb}
-input,select,button{padding:10px;border-radius:8px;border:1px solid #ccc} button{background:#0a84ff;color:white}
-</style></head><body>
-<div class='header'><h1>🏥 AI Health Assistant</h1></div>
-<div class='container'>
-<div class='card'>
-<h3>💡 Suggested Questions</h3>
-<div id='suggestions'></div>
-<h3>💬 Ask Your Health Question</h3>
-<div id='chat'><div class='msg bot'>Hello! Ask me any general health, fitness, nutrition, sleep, stress, exercise, BMI or wellness question.</div></div>
-<div style='margin-top:10px'><input id='q' style='width:75%' placeholder='Type your question...'> <button onclick='send()'>Ask</button></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vitals — Everyday Health Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E2A26;
+    --teal:#14453D;
+    --teal-deep:#0D302A;
+    --sage:#DCE8E0;
+    --sage-line:#C4D6CB;
+    --cream:#F6F3EC;
+    --gold:#C9A66B;
+    --gold-deep:#A5824F;
+    --paper:#FFFFFF;
+    --ok:#3F7A5C;
+    --warn:#B5762B;
+    --danger:#A4432F;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--gold);color:var(--teal-deep)}
+
+  a{color:inherit}
+
+  .topbar{
+    background:var(--teal);
+    color:var(--sage);
+    padding:14px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:3px solid var(--gold);
+  }
+  .topbar .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    letter-spacing:.02em;
+    color:#fff;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,166,107,.25)}
+  .topbar .tag{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;font-family:'IBM Plex Mono',monospace}
+
+  .hero{
+    padding:56px 28px 40px;
+    text-align:center;
+    background:
+      radial-gradient(circle at 18% 20%, rgba(201,166,107,.16), transparent 45%),
+      radial-gradient(circle at 82% 30%, rgba(20,69,61,.10), transparent 50%),
+      var(--cream);
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:clamp(30px,4.4vw,50px);
+    margin:0 0 12px;
+    color:var(--teal-deep);
+    letter-spacing:-.01em;
+  }
+  .hero p{
+    max-width:560px;
+    margin:0 auto;
+    color:#4A5C55;
+    font-size:15.5px;
+    line-height:1.6;
+  }
+
+  /* Vitals strip — signature element */
+  .vitals{
+    max-width:1100px;
+    margin:32px auto 0;
+    padding:0 28px;
+  }
+  .vitals-inner{
+    background:var(--teal-deep);
+    border-radius:var(--radius);
+    padding:18px 24px;
+    display:flex;
+    gap:0;
+    overflow-x:auto;
+    box-shadow:0 14px 30px -14px rgba(13,48,42,.55);
+  }
+  .vital{
+    flex:1;
+    min-width:150px;
+    padding:6px 22px;
+    border-right:1px solid rgba(255,255,255,.12);
+    color:#EAF2EC;
+  }
+  .vital:last-child{border-right:none}
+  .vital .vlabel{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;align-items:center;gap:6px;
+  }
+  .vital .vlabel::before{
+    content:'';
+    width:6px;height:6px;border-radius:50%;
+    background:var(--gold);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  .vital .vval{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:22px;
+    margin-top:4px;
+    font-weight:500;
+  }
+  .vital .vsub{font-size:11px;color:#B7C9C0;margin-top:2px}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+
+  .container{max-width:1100px;margin:0 auto;padding:36px 28px 80px;display:grid;grid-template-columns:1.15fr .85fr;gap:24px}
+  @media (max-width:860px){.container{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--paper);
+    border-radius:var(--radius);
+    padding:24px;
+    border:1px solid var(--sage-line);
+    margin-bottom:24px;
+  }
+  .card h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:20px;
+    margin:0 0 4px;
+    color:var(--teal-deep);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gold-deep);
+    margin-bottom:8px;
+    display:block;
+  }
+  .card .desc{color:#5B6C64;font-size:13.5px;margin:0 0 16px;line-height:1.5}
+
+  /* Suggestion chips */
+  #suggestions{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-bottom:16px;max-height:150px;overflow:auto;
+    padding-right:4px;
+  }
+  #suggestions::-webkit-scrollbar{width:6px}
+  #suggestions::-webkit-scrollbar-thumb{background:var(--sage-line);border-radius:6px}
+  .tag{
+    background:var(--sage);
+    color:var(--teal-deep);
+    padding:7px 13px;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:12.5px;
+    font-weight:500;
+    border:1px solid transparent;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .tag:hover{background:var(--gold);color:#fff;border-color:var(--gold-deep)}
+
+  #chat{
+    height:380px;
+    overflow-y:auto;
+    border:1px solid var(--sage-line);
+    padding:14px;
+    border-radius:12px;
+    background:#FBFAF6;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  #chat::-webkit-scrollbar{width:7px}
+  #chat::-webkit-scrollbar-thumb{background:var(--sage-line);border-radius:6px}
+  .msg{
+    padding:11px 14px;
+    border-radius:12px;
+    font-size:14px;
+    line-height:1.55;
+    max-width:88%;
+    animation:rise .25s ease;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .user{background:var(--teal);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+  .bot{background:var(--sage);color:var(--teal-deep);align-self:flex-start;border-bottom-left-radius:3px}
+  .bot .more-btn{
+    display:inline-block;margin-top:6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--gold-deep);cursor:pointer;text-decoration:underline;
+  }
+  .disclaimer{font-size:11px;color:#7C8B84;margin-top:4px;font-style:italic}
+
+  .input-row{display:flex;gap:8px;margin-top:12px}
+  input[type=text], input[type=number], select{
+    padding:11px 12px;
+    border-radius:10px;
+    border:1px solid var(--sage-line);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:.15s;
+  }
+  input[type=text]:focus, input[type=number]:focus, select:focus{border-color:var(--gold)}
+  #q{flex:1}
+  button{
+    padding:11px 18px;
+    border-radius:10px;
+    border:none;
+    background:var(--teal);
+    color:#fff;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  button:hover{background:var(--teal-deep)}
+  button:focus-visible, .tag:focus-visible, input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:11.5px;color:#5B6C64;font-weight:600;letter-spacing:.02em}
+
+  .result{
+    margin-top:14px;
+    padding:16px;
+    border-radius:12px;
+    background:var(--sage);
+    display:none;
+  }
+  .result.show{display:block}
+  .result .rlabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-deep);opacity:.7}
+  .result .rval{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;color:var(--teal-deep);margin:4px 0}
+  .result .rcat{
+    display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;color:#fff;
+  }
+  .cat-under{background:#5A8FBF}
+  .cat-normal{background:var(--ok)}
+  .cat-over{background:var(--warn)}
+  .cat-obese{background:var(--danger)}
+  .result .rnote{font-size:12.5px;color:#4A5C55;margin-top:8px;line-height:1.5}
+
+  .bar{height:8px;border-radius:6px;background:#fff;margin-top:10px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:6px;transition:width .4s ease}
+
+  footer{
+    text-align:center;
+    padding:26px 20px 40px;
+    color:#7C8B84;
+    font-size:12px;
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>Vitals</div>
+  <div class="tag">Everyday Health Companion</div>
 </div>
-<div class='card'>
-<h3>📊 BMI Calculator</h3>
-<input id='h' placeholder='Height (cm)'><input id='w' placeholder='Weight (kg)'>
-<button onclick='bmi()'>Calculate BMI</button><p id='b'></p>
+
+<div class="hero">
+  <h1>Plain-language answers for everyday health questions</h1>
+  <p>Ask about sleep, nutrition, movement, stress, or run the numbers on BMI and calorie needs. General wellness guidance only — not a substitute for medical care.</p>
 </div>
-<div class='card'>
-<h3>🔥 Calorie Estimator</h3>
-<select id='g'><option value='male'>Male</option><option value='female'>Female</option></select>
-<input id='age' placeholder='Age'><input id='wt' placeholder='Weight (kg)'><input id='ht' placeholder='Height (cm)'>
-<button onclick='cal()'>Estimate Calories</button><p id='c'></p>
-</div></div>
+
+<div class="vitals">
+  <div class="vitals-inner">
+    <div class="vital">
+      <div class="vlabel">BMI reading</div>
+      <div class="vval" id="vitalBmi">—</div>
+      <div class="vsub" id="vitalBmiSub">Run the calculator below</div>
+    </div>
+    <div class="vital">
+      <div class="vlabel">Est. daily energy</div>
+      <div class="vval" id="vitalCal">—</div>
+      <div class="vsub" id="vitalCalSub">kcal / day at rest</div>
+    </div>
+    <div class="vital">
+      <div class="vlabel">Questions answered</div>
+      <div class="vval" id="vitalQ">0</div>
+      <div class="vsub">this session</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div>
+    <div class="card">
+      <span class="eyebrow">Ask</span>
+      <h2>💬 Your health question</h2>
+      <p class="desc">Tap a suggestion or type your own. Covers nutrition, fitness, sleep, stress, and common wellness topics.</p>
+      <div id="suggestions"></div>
+      <div id="chat">
+        <div class="msg bot">Hello! Ask me anything about sleep, nutrition, fitness, stress, or general wellness — or try one of the suggestions above.</div>
+      </div>
+      <div class="input-row">
+        <input id="q" type="text" placeholder="Type your question and press Enter…">
+        <button onclick="send()">Ask</button>
+      </div>
+      <div class="disclaimer">General wellness information only. For diagnosis, treatment, or emergencies, consult a qualified healthcare professional.</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <span class="eyebrow">Calculate</span>
+      <h2>📊 BMI calculator</h2>
+      <p class="desc">Body mass index from your height and weight.</p>
+      <div class="calc-grid">
+        <div class="field"><label for="h">Height (cm)</label><input id="h" type="number" placeholder="170"></div>
+        <div class="field"><label for="w">Weight (kg)</label><input id="w" type="number" placeholder="65"></div>
+      </div>
+      <button onclick="bmi()" style="width:100%">Calculate BMI</button>
+      <div class="result" id="bmiResult">
+        <div class="rlabel">Your BMI</div>
+        <div class="rval" id="bmiVal">—</div>
+        <span class="rcat" id="bmiCat">—</span>
+        <div class="bar"><div class="bar-fill" id="bmiBar" style="width:0%"></div></div>
+        <div class="rnote" id="bmiNote"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="eyebrow">Calculate</span>
+      <h2>🔥 Calorie estimator</h2>
+      <p class="desc">Estimated resting energy needs (Mifflin-St Jeor).</p>
+      <div class="calc-grid">
+        <div class="field"><label for="g">Sex</label>
+          <select id="g"><option value="male">Male</option><option value="female">Female</option></select>
+        </div>
+        <div class="field"><label for="age">Age</label><input id="age" type="number" placeholder="30"></div>
+        <div class="field"><label for="wt">Weight (kg)</label><input id="wt" type="number" placeholder="65"></div>
+        <div class="field"><label for="ht">Height (cm)</label><input id="ht" type="number" placeholder="170"></div>
+      </div>
+      <button onclick="cal()" style="width:100%">Estimate calories</button>
+      <div class="result" id="calResult">
+        <div class="rlabel">Estimated BMR</div>
+        <div class="rval" id="calVal">—</div>
+        <div class="rnote" id="calNote"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Vitals gives general wellness information, not medical advice. Always check with a doctor or qualified professional for personal health decisions.</footer>
+
 <script>
-const questions=["How much water should I drink?","How much sleep do I need?","Healthy diet tips?","How can I lose weight?","How can I gain weight?","Benefits of walking?","What is BMI?","How to reduce stress?","How to improve focus?","What causes headaches?","How to boost immunity?","Healthy breakfast ideas?","Protein benefits?","Vitamin D benefits?","How many calories do I need?","How to lower cholesterol?","What is healthy blood pressure?","How to avoid dehydration?","Exercise for beginners?","Heart healthy foods?","What is diabetes?","How to sleep better?","Reduce anxiety tips?","Back pain tips?","Healthy snacks?","What causes fatigue?","Benefits of stretching?","Foods high in iron?","Importance of fiber?","Cold remedies?","Daily step goal?","Weight loss foods?","Meditation benefits?","Running benefits?","Strength training?","Healthy aging tips?","Office exercise tips?","Hydration importance?","Mental wellness tips?","Exercise frequency?","How much protein daily?","Healthy habits?","Improve posture?","Joint health tips?","Bone health tips?","Prevent burnout?","What is metabolism?","Stress eating tips?","Healthy heart habits?","Sleep schedule tips?","Best foods for energy?","Reduce sugar intake?","Immune health foods?","Healthy lifestyle?","Healthy lunch ideas?","Healthy dinner ideas?","What causes dizziness?","How many fruits daily?","How many vegetables daily?","Benefits of yoga?"];
-questions.forEach(x=>{let s=document.createElement('span');s.className='tag';s.innerText=x;s.onclick=()=>{q.value=x;send()};suggestions.appendChild(s);});
-function add(t,c){chat.innerHTML+=`<div class="msg ${c}">${t}</div>`;chat.scrollTop=chat.scrollHeight;}
-function reply(q){q=q.toLowerCase();
-if(q.includes('hello')||q.includes('hi')) return 'Hello! How can I support your health and wellness goals today?';
-if(q.includes('sleep')) return 'Most adults need 7 to 9 hours of quality sleep each night.';
-if(q.includes('water')||q.includes('hydration')) return 'Most adults benefit from around 2 to 3 liters of fluid daily.';
-if(q.includes('weight loss')) return 'Combine a balanced diet, calorie awareness, and regular exercise.';
-if(q.includes('stress')||q.includes('anxiety')) return 'Deep breathing, exercise, sleep and mindfulness can help manage stress.';
-if(q.includes('heart')) return 'Regular exercise, less processed food, and maintaining healthy weight support heart health.';
-if(q.includes('blood pressure')) return 'Healthy lifestyle habits and regular monitoring are important.';
-if(q.includes('protein')) return 'Protein supports muscle repair and overall body functions.';
-if(q.includes('vitamin')) return 'Vitamins support essential body functions and overall wellness.';
-if(q.includes('diabetes')) return 'Healthy eating, physical activity and medical follow-up help manage diabetes.';
-if(q.includes('headache')) return 'Hydration, sleep and stress reduction may help occasional headaches.';
-return 'I can provide general wellness guidance on nutrition, exercise, sleep, stress management, BMI, calories, healthy habits and common wellness questions. For diagnosis or emergencies, consult a healthcare professional.';}
-function send(){let t=q.value.trim(); if(!t)return; add(t,'user'); setTimeout(()=>add(reply(t),'bot'),200); q.value='';}
-function bmi(){let hm=parseFloat(h.value)/100,kg=parseFloat(w.value); let v=(kg/(hm*hm)).toFixed(1); let cat=v<18.5?'Underweight':v<25?'Normal':v<30?'Overweight':'Obese'; b.innerHTML='BMI: '+v+' ('+cat+')';}
-function cal(){let agev=+age.value,wv=+wt.value,hv=+ht.value; let bmr=g.value==='male'?(10*wv+6.25*hv-5*agev+5):(10*wv+6.25*hv-5*agev-161); c.innerHTML='Estimated BMR: '+Math.round(bmr)+' kcal/day';}
-</script></body></html>
+/* ---------- Knowledge base: 100+ topics ---------- */
+const KB = [
+  {k:['water','hydration','fluids'], a:'Most adults do well with roughly 2–3 liters of fluid a day from drinks and food, more if it\'s hot or you\'re active. Thirst and pale-yellow urine are decent everyday guides.'},
+  {k:['sleep','how much sleep','insomnia','sleep schedule'], a:'Most adults function best on 7–9 hours of sleep a night. Going to bed and waking at consistent times helps more than the total hours alone.'},
+  {k:['sleep better','fall asleep','sleep quality'], a:'Keep a consistent bedtime, dim lights an hour before bed, limit caffeine after midday, and keep screens out of the last 30 minutes before sleep.'},
+  {k:['diet','healthy eating','nutrition tips'], a:'A helpful pattern is mostly vegetables, fruit, whole grains, lean protein and healthy fats, with processed foods and added sugar kept occasional rather than daily.'},
+  {k:['lose weight','weight loss','fat loss'], a:'Sustainable weight loss usually comes from a modest calorie deficit, protein and fiber at each meal, regular movement, and enough sleep — crash diets rarely stick.'},
+  {k:['gain weight','bulk','weight gain'], a:'Healthy weight gain pairs a calorie surplus with strength training, plus enough protein, so the added weight is more muscle than fat.'},
+  {k:['walking','benefits of walking'], a:'A daily walk supports heart health, mood, blood sugar control, and joint mobility — even 20–30 minutes makes a measurable difference.'},
+  {k:['bmi','body mass index'], a:'BMI is weight in kilograms divided by height in meters squared. It\'s a quick screening number, not a full picture of health — muscle mass and body composition aren\'t captured.'},
+  {k:['stress','reduce stress'], a:'Regular exercise, adequate sleep, breathing exercises, and short breaks during the day are all evidence-backed ways to bring stress down.'},
+  {k:['focus','concentration','improve focus'], a:'Good sleep, short focused work blocks with breaks, hydration, and reducing multitasking tend to help concentration more than any single trick.'},
+  {k:['headache','headaches'], a:'Common everyday triggers include dehydration, poor sleep, skipped meals, eye strain, and tension. Frequent or severe headaches deserve a doctor\'s look.'},
+  {k:['immunity','immune system','boost immunity'], a:'Sleep, a varied diet with plenty of plants, regular movement, and stress management all support normal immune function — no single food is a magic fix.'},
+  {k:['breakfast'], a:'A breakfast with protein, fiber, and some healthy fat — like eggs with vegetables, or yogurt with fruit and nuts — tends to keep energy steadier than sugary options.'},
+  {k:['protein'], a:'Protein supports muscle repair, satiety, and many body functions. Many adults do well aiming for roughly 1.2–1.6g per kg of body weight if they\'re active.'},
+  {k:['vitamin d'], a:'Vitamin D supports bone health and immune function. Sunlight exposure, fatty fish, fortified foods, or a supplement can help if levels run low.'},
+  {k:['how many calories','calorie needs','daily calories'], a:'Daily needs vary with age, sex, size, and activity level — the calculator on this page gives a resting estimate as a starting point.'},
+  {k:['cholesterol','lower cholesterol'], a:'Less saturated fat, more fiber (oats, beans, vegetables), regular exercise, and not smoking are the main everyday levers for cholesterol.'},
+  {k:['blood pressure','hypertension'], a:'Healthy blood pressure is generally under 120/80 mmHg. Less sodium, regular activity, moderate alcohol, and stress management all help keep it in range.'},
+  {k:['dehydration','avoid dehydration'], a:'Watch for dark urine, dry mouth, fatigue, or dizziness. Sipping fluids through the day, rather than large amounts at once, works better for most people.'},
+  {k:['exercise for beginners','start exercising','beginner workout'], a:'Start with 2–3 sessions a week combining brisk walking and simple bodyweight strength moves, then build duration and intensity gradually.'},
+  {k:['heart healthy','heart health'], a:'Vegetables, fruit, whole grains, fish, nuts, and olive oil are consistently linked to heart health, alongside regular movement and not smoking.'},
+  {k:['diabetes'], a:'Type 2 diabetes involves the body struggling to regulate blood sugar. Diet quality, regular activity, and weight management are central to prevention and management, alongside medical care.'},
+  {k:['anxiety','calm down','worry'], a:'Slow breathing, movement, naming what\'s worrying you, and limiting caffeine can all take the edge off day-to-day anxiety; persistent anxiety is worth discussing with a professional.'},
+  {k:['back pain'], a:'Gentle movement, core strengthening, good posture at your desk, and avoiding long unbroken sitting periods help many everyday back aches.'},
+  {k:['healthy snacks','snack ideas'], a:'Fruit with nut butter, yogurt, vegetables with hummus, or a handful of nuts give steadier energy than chips or sweets.'},
+  {k:['fatigue','tired','low energy'], a:'Common everyday causes are poor sleep, dehydration, low iron, stress, or an irregular eating pattern. Ongoing fatigue is worth a medical check.'},
+  {k:['stretching','flexibility'], a:'Regular stretching improves range of motion, can ease muscle tightness, and pairs well with a warm-up or cool-down around exercise.'},
+  {k:['iron','iron rich foods'], a:'Red meat, poultry, beans, lentils, and leafy greens are good iron sources; pairing plant sources with vitamin C improves absorption.'},
+  {k:['fiber'], a:'Fiber supports digestion, steadier blood sugar, and heart health. Whole grains, legumes, fruit, and vegetables are the main sources.'},
+  {k:['cold remedy','common cold'], a:'Rest, fluids, and time are the mainstays for a common cold; over-the-counter options can ease symptoms, but a persistent high fever warrants medical attention.'},
+  {k:['step goal','steps per day','how many steps'], a:'10,000 steps a day is a popular target, but research suggests real benefits start appearing from around 5,000–7,000 steps, so any increase helps.'},
+  {k:['weight loss foods'], a:'High-protein, high-fiber, lower-calorie-density foods — vegetables, legumes, lean protein, fruit — tend to keep you fuller for fewer calories.'},
+  {k:['meditation'], a:'Regular meditation is linked to lower stress, better focus, and improved emotional regulation, even in short daily sessions of 5–10 minutes.'},
+  {k:['running','jogging'], a:'Running builds cardiovascular fitness and endurance; building mileage gradually and adding rest days helps avoid overuse injuries.'},
+  {k:['strength training','weight lifting','resistance training'], a:'Strength training preserves muscle, supports bone density, and boosts metabolism; most adults benefit from 2–3 sessions a week covering major muscle groups.'},
+  {k:['healthy aging'], a:'Staying active, keeping social connections, eating well, and regular check-ups all support healthy aging beyond genetics alone.'},
+  {k:['office exercise','desk exercise','sedentary'], a:'Standing up every 30–60 minutes, short walks, and simple desk stretches offset the effects of long sitting periods.'},
+  {k:['mental wellness','mental health tips'], a:'Sleep, movement, social connection, and manageable stress levels are foundational to mental wellness — support from a professional is valuable when things feel heavy.'},
+  {k:['exercise frequency','how often exercise'], a:'A common guideline is about 150 minutes of moderate activity a week, plus two strength sessions — spread however fits your schedule.'},
+  {k:['protein daily','how much protein'], a:'General guidance is around 0.8g per kg of body weight for sedentary adults, rising to 1.2–1.6g per kg for active or strength-training individuals.'},
+  {k:['healthy habits'], a:'Consistent sleep, regular movement, balanced meals, hydration, and stress management form the backbone of most healthy routines.'},
+  {k:['posture','improve posture'], a:'Strengthening the core and upper back, adjusting screen height, and taking movement breaks all help counter slouched posture over time.'},
+  {k:['joint health','joint pain'], a:'Regular low-impact movement, maintaining a healthy weight, and strength around joints all help protect them; persistent pain deserves medical evaluation.'},
+  {k:['bone health'], a:'Calcium, vitamin D, and weight-bearing exercise like walking or strength training all support bone density over time.'},
+  {k:['burnout','prevent burnout'], a:'Regular breaks, realistic workloads, sleep, and time away from work all help prevent burnout; persistent exhaustion is worth addressing early.'},
+  {k:['metabolism'], a:'Metabolism is how your body converts food into energy. It\'s influenced by muscle mass, age, activity level, and genetics — no single food dramatically speeds it up.'},
+  {k:['stress eating','emotional eating'], a:'Noticing the urge, pausing before eating, and having a non-food coping option ready (a walk, a call, a breathing exercise) can help interrupt stress eating.'},
+  {k:['sleep schedule','consistent sleep'], a:'Going to bed and waking at similar times daily, even on weekends, helps regulate your body clock and improves sleep quality over time.'},
+  {k:['energy foods','best foods for energy'], a:'Whole grains, fruit, nuts, and protein-rich foods give steadier energy than sugary snacks, which cause a quick rise and fall in blood sugar.'},
+  {k:['reduce sugar','sugar intake'], a:'Cutting back on sugary drinks first, reading labels for added sugar, and choosing whole fruit over juice are practical starting points.'},
+  {k:['immune foods'], a:'Citrus, leafy greens, yogurt, garlic, and colorful vegetables provide nutrients that support normal immune function as part of an overall balanced diet.'},
+  {k:['healthy lifestyle'], a:'A healthy lifestyle blends balanced eating, regular movement, good sleep, stress management, and routine medical check-ups.'},
+  {k:['healthy lunch'], a:'A plate with lean protein, whole grains, and vegetables — like a grain bowl or a hearty salad with beans — makes a balanced, sustaining lunch.'},
+  {k:['healthy dinner'], a:'Lean protein, vegetables, and a modest portion of whole grains make a balanced dinner that supports good sleep without feeling too heavy.'},
+  {k:['dizziness','dizzy'], a:'Dehydration, low blood sugar, standing up too fast, or inner-ear issues are common everyday causes. Frequent or severe dizziness needs medical evaluation.'},
+  {k:['fruits daily','how many fruits'], a:'A common guideline is around 2 servings of fruit a day as part of a varied diet rich in plants.'},
+  {k:['vegetables daily','how many vegetables'], a:'Aiming for roughly 3–5 servings of vegetables daily, in a range of colors, covers a broad spread of nutrients.'},
+  {k:['yoga','benefits of yoga'], a:'Yoga combines movement, breathing, and flexibility work, and is linked to reduced stress, better balance, and improved mobility.'},
+  {k:['caffeine','coffee'], a:'Moderate caffeine (around 400mg, roughly 3–4 cups of coffee) is generally fine for most healthy adults, but can disrupt sleep if taken later in the day.'},
+  {k:['alcohol'], a:'Guidelines generally recommend keeping alcohol moderate — up to one drink a day for women and two for men — with regular alcohol-free days.'},
+  {k:['smoking','quit smoking'], a:'Quitting smoking rapidly reduces heart and lung disease risk. Combining support (counseling, nicotine replacement, or medication) improves the odds of quitting for good.'},
+  {k:['muscle soreness','sore muscles','doms'], a:'Delayed muscle soreness after new exercise is normal and usually eases within a few days; light movement, hydration, and rest help recovery.'},
+  {k:['warm up','cool down'], a:'A warm-up raises heart rate and loosens muscles before exercise; a cool-down with light activity and stretching helps recovery afterward.'},
+  {k:['screen time','eye strain'], a:'The 20-20-20 rule — every 20 minutes, look at something 20 feet away for 20 seconds — helps reduce digital eye strain.'},
+  {k:['pregnancy nutrition'], a:'Pregnancy nutrition generally emphasizes folate, iron, calcium, and protein — always coordinated with an obstetrician or midwife for individual needs.'},
+  {k:['menopause'], a:'Menopause symptoms can be eased with regular exercise, calcium and vitamin D, good sleep habits, and, for some, medical treatment discussed with a doctor.'},
+  {k:['allergy','allergies'], a:'Common seasonal allergy relief includes avoiding known triggers, antihistamines, and keeping windows closed on high-pollen days; persistent symptoms warrant medical advice.'},
+  {k:['acne','skin'], a:'Gentle cleansing, avoiding over-washing, staying hydrated, and not picking at skin generally help; persistent acne is well worth seeing a dermatologist for.'},
+  {k:['hair loss'], a:'Hair loss can stem from stress, nutrition, hormones, or genetics. A doctor or dermatologist can help pinpoint the cause and options.'},
+  {k:['constipation'], a:'More fiber, fluids, and physical activity are the first everyday steps for constipation; persistent issues should be checked by a doctor.'},
+  {k:['bloating'], a:'Eating slowly, moderating carbonated drinks, and noticing trigger foods can reduce everyday bloating; ongoing bloating deserves medical attention.'},
+  {k:['heartburn','acid reflux'], a:'Smaller meals, avoiding lying down right after eating, and cutting back on spicy or fatty trigger foods can ease occasional heartburn.'},
+  {k:['muscle cramp','leg cramps'], a:'Hydration, stretching, and adequate magnesium and potassium intake can reduce the frequency of muscle cramps for many people.'},
+  {k:['sunscreen','sun protection'], a:'Broad-spectrum SPF 30+ reapplied every two hours, plus shade and protective clothing, are the core steps for sun protection.'},
+  {k:['mental fatigue','brain fog'], a:'Poor sleep, dehydration, stress, and long unbroken focus periods commonly contribute to brain fog; breaks and better sleep often help first.'},
+  {k:['gut health','microbiome'], a:'Fiber-rich foods, fermented foods like yogurt, and diverse plant intake all support a healthy gut microbiome.'},
+  {k:['intermittent fasting'], a:'Intermittent fasting can help some people manage calorie intake, but it isn\'t inherently superior to other approaches — what matters most is overall diet quality and consistency.'},
+  {k:['stretch marks'], a:'Stretch marks are common and largely genetic; moisturizing may improve comfort, but they typically fade in appearance over time regardless of treatment.'},
+  {k:['cardio vs strength','cardio or weights'], a:'Cardio and strength training offer different benefits — heart fitness versus muscle and bone strength — so a well-rounded routine includes both.'},
+  {k:['recovery day','rest day'], a:'Rest days let muscles repair and reduce injury risk; active recovery like walking or light stretching is often better than total inactivity.'},
+  {k:['electrolytes'], a:'Electrolytes like sodium, potassium, and magnesium help with hydration and muscle function, especially useful during intense or prolonged exercise.'},
+  {k:['sleep apnea','snoring'], a:'Loud snoring with pauses in breathing can indicate sleep apnea, which is worth discussing with a doctor since it affects long-term health.'},
+  {k:['posture desk','ergonomics'], a:'A monitor at eye level, feet flat on the floor, and elbows near 90 degrees are the basics of a more ergonomic desk setup.'},
+  {k:['hangover'], a:'Rehydrating, eating, and rest are the main remedies for a hangover — moderating alcohol intake is the most reliable prevention.'},
+  {k:['sore throat'], a:'Warm fluids, honey, rest, and gargling salt water can ease a mild sore throat; one lasting more than a week deserves medical review.'},
+  {k:['nausea'], a:'Small sips of fluid, ginger, and bland foods can help mild nausea; persistent or severe nausea should be checked by a doctor.'},
+  {k:['motion sickness'], a:'Looking at the horizon, sitting where motion is felt least, and fresh air can reduce motion sickness; medication is an option for frequent travelers.'},
+  {k:['hiccups'], a:'Slow breathing, sipping water, or holding your breath briefly are common ways to ease ordinary hiccups, which usually pass on their own.'},
+  {k:['ear pain'], a:'Mild ear discomfort can follow colds or pressure changes; pain that\'s severe, sudden, or with fever should be evaluated by a doctor.'},
+  {k:['toothache','dental'], a:'Rinsing with warm salt water and over-the-counter pain relief can help temporarily, but a toothache should be seen by a dentist promptly.'},
+  {k:['blister'], a:'Keep a blister clean and covered, avoid popping it if possible, and choose well-fitted footwear to prevent new ones.'},
+  {k:['nosebleed'], a:'Sit up, lean slightly forward, and pinch the soft part of the nose for about 10 minutes; frequent nosebleeds warrant medical review.'},
+  {k:['bruise'], a:'Rest, ice in the first 24–48 hours, and elevation help ordinary bruises heal; unexplained frequent bruising is worth a doctor\'s look.'},
+  {k:['sprain'], a:'RICE — rest, ice, compression, elevation — is the standard first step for a mild sprain; inability to bear weight needs medical assessment.'},
+  {k:['sunburn'], a:'Cool compresses, moisturizer, hydration, and staying out of further sun exposure help sunburned skin recover.'},
+  {k:['insect bite','mosquito bite'], a:'Cleaning the area, a cold compress, and avoiding scratching reduce irritation from ordinary insect bites.'},
+  {k:['jet lag'], a:'Adjusting sleep times gradually before travel, getting daylight exposure at the destination, and staying hydrated can ease jet lag.'},
+  {k:['stress management'], a:'Regular exercise, sleep, social support, and structured relaxation practices like breathing exercises are core stress management tools.'},
+  {k:['work life balance'], a:'Clear boundaries around work hours, regular breaks, and protecting time for rest and relationships all support a healthier balance.'},
+  {k:['social connection','loneliness'], a:'Regular contact with friends or family, joining shared activities, and community involvement all support wellbeing and counter loneliness.'},
+  {k:['screen before bed','blue light'], a:'Reducing screen use in the hour before bed, or using night mode, can help some people fall asleep more easily.'},
+  {k:['bmi children','child bmi'], a:'BMI for children and teens uses age- and sex-specific percentile charts rather than the adult categories — best interpreted with a pediatrician.'},
+  {k:['pulse','resting heart rate'], a:'A typical resting heart rate for adults is roughly 60–100 beats per minute; regular cardio training often brings it toward the lower end over time.'},
+  {k:['muscle gain','build muscle'], a:'Progressive strength training, adequate protein, and enough calories and recovery time together drive muscle growth.'},
+  {k:['detox','cleanse'], a:'The liver and kidneys handle detoxification naturally; there\'s little evidence that commercial cleanses do more than a balanced diet and hydration already achieve.'},
+  {k:['probiotics'], a:'Probiotic foods like yogurt and kefir may support gut health for some people, though effects vary by individual and strain.'},
+  {k:['multivitamin','supplements'], a:'A varied diet covers most nutrient needs for most people; supplements can help fill specific gaps but are best guided by a blood test or doctor.'},
+  {k:['metabolic rate','bmr'], a:'Basal metabolic rate is the energy your body uses at complete rest just to maintain basic functions — the calculator above gives an estimate.'},
+  {k:['hello','hi ','hey'], a:'Hello! How can I support your health and wellness goals today?'},
+  {k:['thank','thanks'], a:'You\'re welcome — glad it helped. Feel free to ask anything else.'},
+];
+
+const DEFAULT_REPLY = 'I can share general wellness guidance on nutrition, exercise, sleep, stress, and common everyday health questions. For diagnosis, treatment, or anything urgent, please consult a healthcare professional.';
+
+function findReply(raw){
+  const q = raw.toLowerCase();
+  for(const item of KB){
+    if(item.k.some(kw=>q.includes(kw))) return item.a;
+  }
+  return DEFAULT_REPLY;
+}
+
+/* ---------- Suggestion chips (curated subset of KB topics) ---------- */
+const suggestionTopics = [
+  "How much water should I drink?","How much sleep do I need?","Healthy diet tips?","How can I lose weight?",
+  "How can I gain weight?","Benefits of walking?","What is BMI?","How to reduce stress?","How to improve focus?",
+  "What causes headaches?","How to boost immunity?","Healthy breakfast ideas?","Protein benefits?","Vitamin D benefits?",
+  "How many calories do I need?","How to lower cholesterol?","What is healthy blood pressure?","How to avoid dehydration?",
+  "Exercise for beginners?","Heart healthy foods?","What is diabetes?","How to sleep better?","Reduce anxiety tips?",
+  "Back pain tips?","Healthy snacks?","What causes fatigue?","Benefits of stretching?","Foods high in iron?",
+  "Importance of fiber?","Cold remedies?","Daily step goal?","Weight loss foods?","Meditation benefits?",
+  "Running benefits?","Strength training?","Healthy aging tips?","Office exercise tips?","Mental wellness tips?",
+  "Exercise frequency?","How much protein daily?","Healthy habits?","Improve posture?","Joint health tips?",
+  "Bone health tips?","Prevent burnout?","What is metabolism?","Stress eating tips?","Sleep schedule tips?",
+  "Best foods for energy?","Reduce sugar intake?","Immune health foods?","Healthy lifestyle?","Healthy lunch ideas?",
+  "Healthy dinner ideas?","What causes dizziness?","How many fruits daily?","How many vegetables daily?","Benefits of yoga?",
+  "Caffeine limits?","Alcohol guidelines?","Muscle soreness tips?","Gut health tips?","Sleep apnea signs?"
+];
+
+const suggestionsEl = document.getElementById('suggestions');
+suggestionTopics.forEach(text=>{
+  const s = document.createElement('span');
+  s.className = 'tag';
+  s.tabIndex = 0;
+  s.innerText = text;
+  s.onclick = () => { document.getElementById('q').value = text; send(); };
+  s.onkeydown = (e) => { if(e.key==='Enter') s.onclick(); };
+  suggestionsEl.appendChild(s);
+});
+
+/* ---------- Chat ---------- */
+const chatEl = document.getElementById('chat');
+const qInput = document.getElementById('q');
+const vitalQ = document.getElementById('vitalQ');
+let answered = 0;
+
+qInput.addEventListener('keydown', e => { if(e.key === 'Enter') send(); });
+
+function addUser(text){
+  const d = document.createElement('div');
+  d.className = 'msg user';
+  d.textContent = text;
+  chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function addBot(text){
+  const d = document.createElement('div');
+  d.className = 'msg bot';
+  const isLong = text.length > 120;
+  if(isLong){
+    const short = text.slice(0, 90).trim() + '…';
+    const span = document.createElement('span');
+    span.textContent = short;
+    const btn = document.createElement('span');
+    btn.className = 'more-btn';
+    btn.textContent = 'Show more';
+    let expanded = false;
+    btn.onclick = () => {
+      expanded = !expanded;
+      span.textContent = expanded ? text : short;
+      btn.textContent = expanded ? 'Show less' : 'Show more';
+      chatEl.scrollTop = chatEl.scrollHeight;
+    };
+    d.appendChild(span);
+    d.appendChild(document.createElement('br'));
+    d.appendChild(btn);
+  } else {
+    d.textContent = text;
+  }
+  chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function send(){
+  const text = qInput.value.trim();
+  if(!text) return;
+  addUser(text);
+  qInput.value = '';
+  setTimeout(() => {
+    addBot(findReply(text));
+    answered++;
+    vitalQ.textContent = answered;
+  }, 200);
+}
+
+/* ---------- BMI calculator ---------- */
+function bmi(){
+  const hVal = parseFloat(document.getElementById('h').value);
+  const wVal = parseFloat(document.getElementById('w').value);
+  if(!hVal || !wVal || hVal <= 0 || wVal <= 0){
+    alert('Please enter a valid height and weight.');
+    return;
+  }
+  const hm = hVal / 100;
+  const value = wVal / (hm * hm);
+  const rounded = value.toFixed(1);
+
+  let cat, catClass, note, barPct, barColor;
+  if(value < 18.5){ cat='Underweight'; catClass='cat-under'; barColor='#5A8FBF';
+    note='Consider speaking with a doctor or dietitian about nutrient-dense foods to reach a healthier range.'; barPct=Math.min(100,(value/40)*100); }
+  else if(value < 25){ cat='Normal'; catClass='cat-normal'; barColor='#3F7A5C';
+    note='This falls within the typical healthy range for most adults. Keep up balanced eating and regular movement.'; barPct=Math.min(100,(value/40)*100); }
+  else if(value < 30){ cat='Overweight'; catClass='cat-over'; barColor='#B5762B';
+    note='A modest calorie deficit plus regular activity can help shift this toward the typical range over time.'; barPct=Math.min(100,(value/40)*100); }
+  else { cat='Obese'; catClass='cat-obese'; barColor='#A4432F';
+    note='Consider speaking with a healthcare provider about a personalized, sustainable plan.'; barPct=Math.min(100,(value/40)*100); }
+
+  const idealLow = (18.5 * hm * hm).toFixed(1);
+  const idealHigh = (24.9 * hm * hm).toFixed(1);
+
+  document.getElementById('bmiVal').textContent = rounded;
+  const catEl = document.getElementById('bmiCat');
+  catEl.textContent = cat;
+  catEl.className = 'rcat ' + catClass;
+  document.getElementById('bmiNote').textContent = note + ` A weight of roughly ${idealLow}–${idealHigh} kg falls in the typical range at your height.`;
+  const bar = document.getElementById('bmiBar');
+  bar.style.width = barPct + '%';
+  bar.style.background = barColor;
+  document.getElementById('bmiResult').classList.add('show');
+
+  document.getElementById('vitalBmi').textContent = rounded;
+  document.getElementById('vitalBmiSub').textContent = cat;
+}
+
+/* ---------- Calorie / BMR calculator ---------- */
+function cal(){
+  const sex = document.getElementById('g').value;
+  const age = parseFloat(document.getElementById('age').value);
+  const wt = parseFloat(document.getElementById('wt').value);
+  const ht = parseFloat(document.getElementById('ht').value);
+  if(!age || !wt || !ht || age <= 0 || wt <= 0 || ht <= 0){
+    alert('Please enter valid age, weight, and height.');
+    return;
+  }
+  const bmr = sex === 'male'
+    ? (10 * wt + 6.25 * ht - 5 * age + 5)
+    : (10 * wt + 6.25 * ht - 5 * age - 161);
+  const rounded = Math.round(bmr);
+
+  document.getElementById('calVal').textContent = rounded + ' kcal';
+  document.getElementById('calNote').textContent =
+    `This is your estimated energy use at complete rest. Multiply by roughly 1.2–1.9 depending on activity level to estimate total daily needs.`;
+  document.getElementById('calResult').classList.add('show');
+
+  document.getElementById('vitalCal').textContent = rounded;
+  document.getElementById('vitalCalSub').textContent = 'kcal / day at rest';
+}
+</script>
+</body>
+</html>
