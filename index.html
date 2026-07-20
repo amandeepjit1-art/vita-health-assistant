@@ -49,11 +49,10 @@
   .topbar{
     background:linear-gradient(100deg, var(--teal-deep) 0%, var(--teal) 45%, #2E6B5E 75%, var(--sky) 130%);
     color:var(--sage);
-    padding:14px 28px;
+    padding:9px 28px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    border-bottom:3px solid var(--gold);
   }
   .topbar .brand{
     display:flex;align-items:center;gap:10px;
@@ -68,7 +67,7 @@
   .hero{
     position:relative;
     overflow:hidden;
-    padding:40px 28px 32px;
+    padding:18px 28px 16px;
     text-align:center;
     background:
       radial-gradient(circle at 14% 15%, rgba(232,130,90,.22), transparent 42%),
@@ -90,21 +89,21 @@
   .hero .welcome{
     display:inline-block;
     font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:.14em;
+    font-size:10.5px;
+    letter-spacing:.13em;
     text-transform:uppercase;
-    padding:7px 16px;
+    padding:5px 13px;
     border-radius:20px;
     color:#fff;
     background:linear-gradient(100deg, var(--coral), var(--gold-deep) 55%, var(--sky));
-    margin-bottom:18px;
+    margin-bottom:10px;
     box-shadow:0 8px 18px -8px rgba(232,130,90,.55);
   }
   .hero h1{
     font-family:'Fraunces',serif;
     font-weight:600;
-    font-size:clamp(28px,4vw,44px);
-    margin:0 0 8px;
+    font-size:clamp(20px,2.6vw,28px);
+    margin:0 0 6px;
     letter-spacing:-.01em;
     background:linear-gradient(100deg, var(--teal-deep) 0%, #2E6B5E 40%, var(--gold-deep) 75%, var(--coral) 100%);
     -webkit-background-clip:text;
@@ -123,14 +122,14 @@
     max-width:680px;
     margin:0 auto;
     color:#4A5C55;
-    font-size:14.5px;
-    line-height:1.5;
+    font-size:13px;
+    line-height:1.4;
   }
 
   /* Vitals strip — signature element */
   .vitals{
     max-width:1100px;
-    margin:32px auto 0;
+    margin:18px auto 0;
     padding:0 28px;
   }
   .vitals-inner{
@@ -209,7 +208,7 @@
   /* Suggestion chips */
   #suggestions{
     display:flex;flex-wrap:wrap;gap:8px;
-    margin-bottom:16px;max-height:150px;overflow:auto;
+    margin-bottom:14px;max-height:90px;overflow:auto;
     padding-right:4px;
   }
   #suggestions::-webkit-scrollbar{width:6px}
@@ -232,7 +231,7 @@
   .tag:hover{background:var(--gold);color:#fff !important;border-color:var(--gold-deep)}
 
   #chat{
-    height:380px;
+    height:230px;
     overflow-y:auto;
     border:1px solid var(--sage-line);
     padding:14px;
@@ -338,6 +337,55 @@
     font-size:12px;
     line-height:1.6;
   }
+
+  /* Vitamins guide */
+  .vguide-wrap{max-width:1100px;margin:0 auto;padding:0 28px 40px}
+  .vguide-head{text-align:left;margin-bottom:18px}
+  .vguide-head h2{
+    font-family:'Fraunces',serif;font-weight:500;font-size:22px;
+    margin:0 0 4px;color:var(--teal-deep);
+  }
+  .vguide-head .desc{margin:0}
+  .vguide-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(165px, 1fr));
+    gap:8px;
+  }
+  .vcard{
+    background:var(--paper);
+    border:1px solid var(--sage-line);
+    border-left:4px solid var(--teal);
+    border-radius:10px;
+    padding:9px 10px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .vcard:nth-child(4n+2){border-left-color:var(--coral)}
+  .vcard:nth-child(4n+3){border-left-color:var(--sky)}
+  .vcard:nth-child(4n+4){border-left-color:var(--gold-deep)}
+  .vcard:hover{transform:translateY(-2px);box-shadow:0 10px 22px -14px rgba(20,69,61,.4)}
+  .vcard .vname{
+    font-family:'Fraunces',serif;font-weight:600;font-size:13px;color:var(--teal-deep);
+    display:flex;align-items:center;justify-content:space-between;gap:6px;
+  }
+  .vcard .vname small{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--gold-deep);font-weight:600}
+  .vcard .vimportance{font-size:10.5px;color:#4A5C55;line-height:1.35;margin-top:4px}
+  .vcard .vsources, .vcard .vdeficiency{
+    display:none;
+    margin-top:6px;
+  }
+  .vcard.open .vsources{display:flex;flex-wrap:wrap;gap:4px}
+  .vcard.open .vdeficiency{display:block}
+  .vcard .vsrc-tag{
+    background:var(--sage);color:var(--teal-deep);
+    font-size:9.5px;padding:3px 7px;border-radius:12px;font-weight:500;
+  }
+  .vcard .vd-label{
+    font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--danger);font-weight:600;
+  }
+  .vcard .vd-text{font-size:10px;color:#5B4230;line-height:1.4;margin-top:2px}
+  .vcard .vhint{font-size:9px;color:var(--gold-deep);margin-top:6px;font-family:'IBM Plex Mono',monospace;letter-spacing:.03em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -389,6 +437,22 @@
         <button onclick="send()">Ask</button>
       </div>
       <div class="disclaimer">General wellness information only. For diagnosis, treatment, or emergencies, consult a qualified healthcare professional.</div>
+
+      <div id="keyPanel" style="margin-top:10px">
+        <span class="more-btn" id="keyToggle" onclick="toggleKeyPanel()" style="cursor:pointer">⚙ AI settings</span>
+        <div id="keyBox" style="display:none;margin-top:8px;padding:12px;background:var(--sage);border-radius:10px">
+          <div style="font-size:12px;color:var(--teal-deep);margin-bottom:6px;line-height:1.5">
+            Live AI answers work automatically here in Claude. If you've deployed this page elsewhere (e.g. GitHub Pages), paste your own
+            <a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic API key</a> to keep AI answers working — otherwise the built-in topic guide below is used automatically.
+          </div>
+          <div style="display:flex;gap:6px">
+            <input id="apiKeyInput" type="password" placeholder="sk-ant-…" style="flex:1;font-size:12.5px">
+            <button onclick="saveApiKey()" style="padding:9px 14px;font-size:12.5px">Save</button>
+          </div>
+          <div style="font-size:11px;color:#5B6C64;margin-top:6px">Stored in this browser tab only, cleared when you close or reload the page.</div>
+          <div id="keyStatus" style="font-size:11.5px;margin-top:6px;color:var(--ok);font-weight:600"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -444,6 +508,15 @@
     </div>
   </div>
 
+</div>
+
+<div class="vguide-wrap">
+  <div class="vguide-head">
+    <span class="eyebrow">Reference</span>
+    <h2>🍊 Vitamin guide — what they do, where to find them</h2>
+    <p class="desc">Tap a card to see the best fruits &amp; vegetables for each vitamin, plus what can happen if you don't get enough.</p>
+  </div>
+  <div class="vguide-grid" id="vguideGrid"></div>
 </div>
 
 <footer>Vitals gives general wellness information, not medical advice. Always check with a doctor or qualified professional for personal health decisions.</footer>
@@ -563,6 +636,50 @@ const KB = [
   {k:['thank','thanks'], a:'You\'re welcome — glad it helped. Feel free to ask anything else.'},
 ];
 
+/* ---------- Vitamins reference data ---------- */
+const VITAMINS = [
+  {name:'Vitamin A', code:'Retinol', importance:'Supports vision (especially night vision), immune defense, and healthy skin and cell growth.',
+    sources:['Carrots','Sweet potato','Spinach','Mango','Apricots','Red bell pepper'],
+    deficiency:'Night blindness, dry eyes/skin, and a higher risk of infections.'},
+  {name:'Vitamin B1', code:'Thiamine', importance:'Helps convert food into energy and supports normal nerve function.',
+    sources:['Peas','Oranges','Asparagus','Whole grains','Sunflower seeds'],
+    deficiency:'Fatigue, irritability, and nerve problems; severe cases can cause beriberi.'},
+  {name:'Vitamin B2', code:'Riboflavin', importance:'Supports energy production, healthy skin, and normal cell growth.',
+    sources:['Mushrooms','Spinach','Almonds','Avocado','Broccoli'],
+    deficiency:'Cracked lips, sore throat, and skin irritation around the mouth and nose.'},
+  {name:'Vitamin B3', code:'Niacin', importance:'Aids energy metabolism and helps keep skin and the nervous system healthy.',
+    sources:['Mushrooms','Peanuts','Avocado','Potatoes','Green peas'],
+    deficiency:'Skin rashes, digestive upset, and fatigue; severe deficiency causes pellagra.'},
+  {name:'Vitamin B6', code:'Pyridoxine', importance:'Involved in brain development and protein metabolism; supports mood-regulating chemicals.',
+    sources:['Banana','Potatoes','Spinach','Chickpeas','Watermelon'],
+    deficiency:'Irritability, confusion, weakened immunity, and anemia.'},
+  {name:'Vitamin B9', code:'Folate', importance:'Essential for cell division and DNA production; especially important before and during pregnancy.',
+    sources:['Leafy greens','Asparagus','Broccoli','Oranges','Beans','Beetroot'],
+    deficiency:'Fatigue and anemia; low levels in pregnancy raise the risk of neural tube defects.'},
+  {name:'Vitamin B12', code:'Cobalamin', importance:'Supports nerve function and red blood cell formation. Naturally found mainly in animal foods.',
+    sources:['Fortified cereals','Nutritional yeast','Fortified plant milk','(mainly dairy/eggs/meat)'],
+    deficiency:'Fatigue, numbness/tingling, memory problems, and anemia — common risk for strict vegans.'},
+  {name:'Vitamin C', code:'Ascorbic acid', importance:'Boosts immune function, supports collagen production, and acts as an antioxidant.',
+    sources:['Orange','Strawberries','Kiwi','Bell pepper','Broccoli','Guava'],
+    deficiency:'Slow wound healing, bleeding gums, and easy bruising; severe deficiency causes scurvy.'},
+  {name:'Vitamin D', code:'Calciferol', importance:'Supports bone strength and calcium absorption, and plays a role in immune function.',
+    sources:['Sun-exposed mushrooms','Fortified orange juice','Fortified cereal','(mainly sunlight)'],
+    deficiency:'Weak or soft bones, muscle weakness, and higher fracture risk.'},
+  {name:'Vitamin E', code:'Tocopherol', importance:'An antioxidant that protects cells and supports skin and eye health.',
+    sources:['Almonds','Sunflower seeds','Spinach','Avocado','Butternut squash'],
+    deficiency:'Muscle weakness, vision problems, and impaired immune response (uncommon).'},
+  {name:'Vitamin K', code:'Phylloquinone', importance:'Essential for normal blood clotting and supports bone health.',
+    sources:['Kale','Spinach','Broccoli','Brussels sprouts','Cabbage'],
+    deficiency:'Easy bruising and excessive bleeding from cuts.'},
+];
+
+VITAMINS.forEach(v=>{
+  KB.push({
+    k:[v.name.toLowerCase(), v.code.toLowerCase()],
+    a:`${v.name} (${v.code}): ${v.importance} Good sources include ${v.sources.slice(0,4).join(', ')}. A shortfall can cause: ${v.deficiency}`
+  });
+});
+
 const DEFAULT_REPLY = 'I can share general wellness guidance on nutrition, exercise, sleep, stress, and common everyday health questions. For diagnosis, treatment, or anything urgent, please consult a healthcare professional.';
 
 function findReply(raw){
@@ -599,6 +716,28 @@ suggestionTopics.forEach(text=>{
   s.onclick = () => { document.getElementById('q').value = text; send(); };
   s.onkeydown = (e) => { if(e.key==='Enter') s.onclick(); };
   suggestionsEl.appendChild(s);
+});
+
+/* ---------- Vitamins guide rendering ---------- */
+const vguideGrid = document.getElementById('vguideGrid');
+VITAMINS.forEach(v=>{
+  const card = document.createElement('div');
+  card.className = 'vcard';
+  card.innerHTML = `
+    <div class="vname">${v.name} <small>${v.code}</small></div>
+    <div class="vimportance">${v.importance}</div>
+    <div class="vhint">Tap for sources &amp; deficiency</div>
+    <div class="vsources">${v.sources.map(s=>`<span class="vsrc-tag">${s}</span>`).join('')}</div>
+    <div class="vdeficiency">
+      <div class="vd-label">⚠ If you don't get enough</div>
+      <div class="vd-text">${v.deficiency}</div>
+    </div>
+  `;
+  card.onclick = () => {
+    card.classList.toggle('open');
+    card.querySelector('.vhint').textContent = card.classList.contains('open') ? 'Hide details' : "Tap for sources & deficiency";
+  };
+  vguideGrid.appendChild(card);
 });
 
 /* ---------- Chat ---------- */
@@ -660,26 +799,63 @@ function removeTyping(){
 
 const SYSTEM_PROMPT = "You are a friendly, knowledgeable wellness assistant inside a health app called 'AI Health Assistant'. Answer the user's question about nutrition, fitness, sleep, stress, or general wellness in 2-4 concise, warm, plain-language sentences. You are NOT a doctor: never diagnose, never name a specific condition the user hasn't already named, and never give drug dosages. For anything that sounds like a medical emergency, urgent symptom, or a request for diagnosis or treatment, gently recommend seeing a healthcare professional instead of answering directly. Keep tone encouraging and simple.";
 
+let userApiKey = ''; // session-only, kept in memory (never persisted to disk)
+
+function toggleKeyPanel(){
+  const box = document.getElementById('keyBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveApiKey(){
+  const val = document.getElementById('apiKeyInput').value.trim();
+  const status = document.getElementById('keyStatus');
+  if(!val){ status.textContent = ''; userApiKey = ''; return; }
+  userApiKey = val;
+  status.textContent = '✓ Key saved for this session — live AI answers enabled.';
+}
+
+async function callClaude(question, headers){
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: question }]
+    })
+  });
+  if(!response.ok) throw new Error('API error ' + response.status);
+  const data = await response.json();
+  const text = (data.content || []).map(b => b.text || '').join(' ').trim();
+  if(!text) throw new Error('Empty response');
+  return text;
+}
+
 async function getAIReply(question){
+  // 1) Works automatically when previewed inside Claude.ai — no key needed
   try{
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: question }]
-      })
-    });
-    if(!response.ok) throw new Error('API error ' + response.status);
-    const data = await response.json();
-    const text = (data.content || []).map(b => b.text || '').join(' ').trim();
-    if(!text) throw new Error('Empty response');
-    return text;
-  } catch(err){
-    // Backend unavailable (e.g. self-hosted outside Claude.ai) — fall back to the local knowledge base
-    return findReply(question);
+    return await callClaude(question, { "Content-Type": "application/json" });
+  } catch(err1){
+    // 2) If a personal API key has been saved (e.g. for a self-hosted/GitHub Pages deployment), use it
+    if(userApiKey){
+      try{
+        return await callClaude(question, {
+          "Content-Type": "application/json",
+          "x-api-key": userApiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        });
+      } catch(err2){
+        // fall through to local knowledge base
+      }
+    }
+    // 3) Fall back to the built-in local knowledge base so the app still answers matched topics
+    const local = findReply(question);
+    if(local === DEFAULT_REPLY){
+      return local + " (Tip: this page is running without a live AI connection right now — add your free Anthropic API key under ⚙ AI settings below to get open-ended AI answers to any question.)";
+    }
+    return local;
   }
 }
 
